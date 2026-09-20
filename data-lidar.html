@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>LiDAR point cloud — Kanchan Sharma</title>
+<meta name="description" content="Interactive LiDAR point cloud viewer — Kanchan Sharma, IISER Bhopal.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+
+<style>
+:root{
+  --bg:#0B0C10;
+  --bg-2:#141620;
+  --surface:#15171F;
+  --ink:#F5F4F0;
+  --ink-soft:#A7ABC0;
+  --line:#262838;
+  --accent:#E8871E;
+  --accent-2:#6B8F71;
+  --navy:#8FA0F0;
+  --radius:3px;
+  color-scheme: dark;
+}
+html.light{
+  --bg:#F7F5EF;
+  --bg-2:#EFEBDF;
+  --surface:#FFFFFF;
+  --ink:#1B1D2B;
+  --ink-soft:#5B5F73;
+  --line:#E1DCCC;
+  --accent:#C96A0E;
+  --accent-2:#4C6E52;
+  --navy:#1E2761;
+  color-scheme: light;
+}
+
+*{box-sizing:border-box; margin:0; padding:0;}
+html{scroll-behavior:smooth;}
+body{background:var(--bg); color:var(--ink); font-family:'Inter',sans-serif; line-height:1.6; transition:background .25s, color .25s;}
+h1,h2,h3,h4{font-family:'Fraunces',serif; font-weight:600; letter-spacing:-.01em; color:var(--ink);}
+a{color:inherit; text-decoration:none;}
+.mono{font-family:'IBM Plex Mono',monospace;}
+img{max-width:100%; display:block;}
+:focus-visible{outline:2px solid var(--accent); outline-offset:2px;}
+@media (prefers-reduced-motion:reduce){*{transition:none !important; animation:none !important; scroll-behavior:auto !important;}}
+
+header{position:sticky; top:0; z-index:200; background:rgba(11,12,16,.86); backdrop-filter:blur(10px); border-bottom:1px solid var(--line);}
+html.light header{background:rgba(247,245,239,.88);}
+.nav-wrap{max-width:1240px; margin:0 auto; display:flex; align-items:center; justify-content:space-between; padding:18px 32px;}
+.logo{font-family:'Fraunces',serif; font-size:19px; font-weight:600;}
+nav.mainnav{display:flex; align-items:center; gap:6px;}
+nav.mainnav > .navitem{position:relative;}
+nav.mainnav a.toplink, nav.mainnav button.toplink{
+  background:none; border:none; cursor:pointer; font-family:'Inter',sans-serif;
+  color:var(--ink-soft); font-size:14.5px; font-weight:500; padding:9px 13px; border-radius:20px;
+  display:flex; align-items:center; gap:5px;
+}
+nav.mainnav a.toplink:hover, nav.mainnav button.toplink:hover{color:var(--ink); background:var(--bg-2);}
+.caret{font-size:10px; opacity:.7;}
+.dropdown{
+  position:absolute; top:calc(100% + 8px); left:0; min-width:220px;
+  background:var(--surface); border:1px solid var(--line); border-radius:8px;
+  padding:8px; display:none; flex-direction:column; gap:2px; box-shadow:0 12px 30px rgba(0,0,0,.35);
+}
+.navitem:hover .dropdown, .navitem:focus-within .dropdown{display:flex;}
+.dropdown a{padding:9px 12px; font-size:13.8px; border-radius:6px; color:var(--ink-soft);}
+.dropdown a:hover{background:var(--bg-2); color:var(--ink);}
+.nav-right{display:flex; align-items:center; gap:10px;}
+.icon-btn{
+  width:36px; height:36px; border-radius:50%; border:1px solid var(--line); background:var(--surface);
+  display:flex; align-items:center; justify-content:center; cursor:pointer; font-size:15px; color:var(--ink-soft);
+}
+.icon-btn:hover{color:var(--accent); border-color:var(--accent);}
+
+#navcheck{display:none;}
+.hamburger{display:none;}
+
+.section{max-width:1240px; margin:0 auto; padding:88px 32px; border-bottom:1px solid var(--line);}
+.section:last-of-type{border-bottom:none;}
+.eyebrow{font-family:'IBM Plex Mono',monospace; font-size:11.5px; letter-spacing:.12em; text-transform:uppercase; color:var(--accent); margin-bottom:14px; display:flex; align-items:center; gap:10px;}
+.section-title{font-size:clamp(24px,3vw,32px); margin-bottom:10px;}
+.back-link{display:inline-flex; align-items:center; gap:6px; font-size:13.5px; font-weight:600; color:var(--ink-soft); margin-bottom:26px;}
+.back-link:hover{color:var(--accent);}
+
+.gallery-grid{display:grid; grid-template-columns:repeat(3,1fr); gap:14px; margin-top:6px;}
+.gallery-grid figure{margin:0; border:1px solid var(--line); border-radius:8px; overflow:hidden; background:var(--surface);}
+.gallery-grid img{width:100%; aspect-ratio:4/3; object-fit:cover; display:block;}
+.gallery-grid figcaption{padding:8px 10px; font-size:12.5px; color:var(--ink-soft); border-top:1px solid var(--line);}
+.data-topic-blurb{color:var(--ink-soft); max-width:640px; margin-bottom:26px; font-size:14.5px;}
+@media (max-width:768px){ .gallery-grid{grid-template-columns:1fr 1fr;} }
+.lidar-viewer{position:relative; width:100%; aspect-ratio:16/9; border:1px solid var(--line); border-radius:8px; overflow:hidden; background:#05060a;}
+.lidar-viewer canvas{display:block; width:100%; height:100%;}
+.lidar-hint{position:absolute; inset:0; display:flex; align-items:center; justify-content:center; text-align:center; padding:24px; color:var(--ink-soft); font-family:'IBM Plex Mono',monospace; font-size:12.5px; pointer-events:none;}
+
+footer{padding:30px 32px; text-align:center; font-size:12px; color:var(--ink-soft); font-family:'IBM Plex Mono',monospace;}
+
+@media (max-width:768px){
+  nav.mainnav{display:none;}
+  .hamburger{display:flex; width:36px; height:36px; border:1px solid var(--line); border-radius:6px; align-items:center; justify-content:center; cursor:pointer; background:var(--surface);}
+  .hamburger span{display:block; width:16px; height:1.5px; background:var(--ink); position:relative;}
+  .hamburger span::before, .hamburger span::after{content:''; position:absolute; width:16px; height:1.5px; background:var(--ink); left:0;}
+  .hamburger span::before{top:-5px;} .hamburger span::after{top:5px;}
+  #navcheck:checked ~ header nav.mainnav{
+    display:flex; flex-direction:column; align-items:stretch; position:fixed; top:66px; left:0; right:0; bottom:0;
+    background:var(--bg); padding:20px; overflow-y:auto; gap:4px;
+  }
+  #navcheck:checked ~ header .navitem{width:100%;}
+  #navcheck:checked ~ header .dropdown{position:static; display:flex !important; border:none; padding-left:14px; box-shadow:none;}
+  .section{padding:56px 20px;}
+  .gallery-grid{grid-template-columns:1fr;}
+}
+</style>
+</head>
+<body>
+
+<input type="checkbox" id="navcheck">
+
+<header>
+  <div class="nav-wrap">
+    <a href="index.html" class="logo">Kanchan Sharma</a>
+
+    <nav class="mainnav">
+      <div class="navitem"><a href="index.html#about" class="toplink">About</a></div>
+      <div class="navitem">
+        <button class="toplink">Academics <span class="caret">▾</span></button>
+        <div class="dropdown">
+          <a href="academics.html#education">Education</a>
+          <a href="academics.html#coursework">Coursework</a>
+          <a href="academics.html#awards">Awards &amp; Achievements</a>
+          <a href="academics.html#skills">Skills</a>
+          <a href="academics.html#experience">Experience</a>
+        </div>
+      </div>
+      <div class="navitem">
+        <button class="toplink">Research <span class="caret">▾</span></button>
+        <div class="dropdown">
+          <a href="research.html#research">Research</a>
+          <a href="research.html#projects">Current Projects</a>
+          <a href="research.html#publications">Publications</a>
+        </div>
+      </div>
+      <div class="navitem"><a href="conferences.html" class="toplink">Conferences &amp; Talks</a></div>
+      <div class="navitem"><a href="blog.html" class="toplink">Blog</a></div>
+      <div class="navitem"><a href="data.html" class="toplink">Data</a></div>
+      <div class="navitem"><a href="cv.html" class="toplink">CV &amp; Downloads</a></div>
+      <div class="navitem"><a href="index.html#contact" class="toplink">Contact</a></div>
+    </nav>
+
+    <div class="nav-right">
+      <div class="icon-btn" id="modeToggle" role="button" tabindex="0" aria-label="Toggle theme">◐</div>
+      <label for="navcheck" class="hamburger"><span></span></label>
+    </div>
+  </div>
+</header>
+
+<section class="section" style="border-top:1px solid var(--line);">
+  <div class="eyebrow">Data — LiDAR point cloud</div>
+  <h2 class="section-title">LiDAR point cloud</h2>
+  <p class="data-topic-blurb">Drag to rotate, scroll to zoom, right-click drag to pan.</p>
+  <div class="lidar-viewer" id="lidarViewer">
+    <div class="lidar-hint" id="lidarHint">Loading point cloud…</div>
+  </div>
+</section>
+
+<footer>© <span id="yr"></span> Kanchan Sharma .</footer>
+
+<script>
+document.getElementById('yr').textContent = new Date().getFullYear();
+const root = document.documentElement;
+const toggle = document.getElementById('modeToggle');
+function setMode(light){
+  root.classList.toggle('light', light);
+  toggle.textContent = light ? '☾' : '◐';
+  localStorage.setItem('kanchan-theme', light ? 'light' : 'dark');
+}
+const saved = localStorage.getItem('kanchan-theme');
+setMode(saved === 'light');
+toggle.addEventListener('click', () => setMode(!root.classList.contains('light')));
+toggle.addEventListener('keydown', e => { if(e.key==='Enter'||e.key===' '){ e.preventDefault(); toggle.click(); } });
+document.querySelectorAll('nav.mainnav a').forEach(a => a.addEventListener('click', () => { document.getElementById('navcheck').checked = false; }));
+</script>
+
+<script type="module">
+// ---- LiDAR point-cloud viewer (Three.js) ----
+// Put your exported point cloud file at the repo root as: lidar1.ply
+import * as THREE from 'https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js';
+import { OrbitControls } from 'https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/controls/OrbitControls.js';
+import { PLYLoader } from 'https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/loaders/PLYLoader.js';
+
+const container = document.getElementById('lidarViewer');
+const hint = document.getElementById('lidarHint');
+const PLY_FILE = 'lidar1.ply';
+
+if (container) {
+  const scene = new THREE.Scene();
+  scene.background = new THREE.Color(0x05060a);
+
+  const camera = new THREE.PerspectiveCamera(55, container.clientWidth / container.clientHeight, 0.01, 5000);
+  camera.position.set(0, 0, 5);
+
+  const renderer = new THREE.WebGLRenderer({ antialias: true });
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+  renderer.setSize(container.clientWidth, container.clientHeight);
+  container.appendChild(renderer.domElement);
+
+  const controls = new OrbitControls(camera, renderer.domElement);
+  controls.enableDamping = true;
+  controls.dampingFactor = 0.08;
+  controls.screenSpacePanning = true;
+  controls.rotateSpeed = 0.6;
+  controls.zoomSpeed = 0.8;
+  controls.panSpeed = 0.6;
+  controls.mouseButtons = {
+    LEFT: THREE.MOUSE.ROTATE,
+    MIDDLE: THREE.MOUSE.DOLLY,
+    RIGHT: THREE.MOUSE.PAN
+  };
+
+  scene.add(new THREE.AmbientLight(0xffffff, 0.6));
+  const dl = new THREE.DirectionalLight(0xffffff, 0.6);
+  dl.position.set(1, 1, 1);
+  scene.add(dl);
+
+  const loader = new PLYLoader();
+  loader.load(
+    PLY_FILE,
+    (geometry) => {
+      geometry.computeBoundingBox();
+      geometry.computeVertexNormals();
+
+      const hasColor = !!geometry.getAttribute('color');
+      const material = new THREE.PointsMaterial({
+        size: 0.015,
+        sizeAttenuation: true,
+        vertexColors: hasColor,
+        color: hasColor ? 0xffffff : 0xE8871E
+      });
+
+      const points = new THREE.Points(geometry, material);
+
+      // Center and scale the point cloud to fit the view nicely
+      const box = geometry.boundingBox;
+      const center = new THREE.Vector3();
+      box.getCenter(center);
+      points.position.sub(center);
+
+      const size = new THREE.Vector3();
+      box.getSize(size);
+      const maxDim = Math.max(size.x, size.y, size.z) || 1;
+      const scale = 3 / maxDim;
+      points.scale.setScalar(scale);
+
+      scene.add(points);
+
+      camera.position.set(0, 0, maxDim * scale * 1.6 + 2);
+      controls.update();
+
+      hint.style.display = 'none';
+    },
+    (xhr) => {
+      if (xhr.lengthComputable) {
+        const pct = Math.round((xhr.loaded / xhr.total) * 100);
+        hint.textContent = 'Loading point cloud… ' + pct + '%';
+      }
+    },
+    (err) => {
+      hint.innerHTML = 'Point cloud not found yet.<br>Upload your file as <strong>' + PLY_FILE + '</strong> to the repo root to see it here.';
+    }
+  );
+
+  function onResize() {
+    const w = container.clientWidth, h = container.clientHeight;
+    if (!w || !h) return;
+    camera.aspect = w / h;
+    camera.updateProjectionMatrix();
+    renderer.setSize(w, h);
+  }
+  window.addEventListener('resize', onResize);
+
+  function animate() {
+    requestAnimationFrame(animate);
+    controls.update();
+    renderer.render(scene, camera);
+  }
+  animate();
+}
+</script>
+</body>
+</html>
