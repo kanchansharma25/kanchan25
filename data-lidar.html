@@ -183,8 +183,7 @@ document.querySelectorAll('nav.mainnav a').forEach(a => a.addEventListener('clic
 
 <script type="module">
 // ---- LiDAR point-cloud viewer (Three.js) ----
-// Reads a CSV point cloud from the repo root: lidar1.ply
-// (the file just needs to contain CSV data — the extension doesn't matter to this parser)
+// Reads a CSV point cloud from the repo root: lidar1.csv
 // Auto-detects columns: looks for x/y/z and optional r,g,b (or red,green,blue) in the header row.
 // If there's no header, it assumes the column order is x,y,z[,r,g,b].
 import * as THREE from 'https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js';
@@ -192,7 +191,7 @@ import { OrbitControls } from 'https://cdn.jsdelivr.net/npm/three@0.160.0/exampl
 
 const container = document.getElementById('lidarViewer');
 const hint = document.getElementById('lidarHint');
-const DATA_FILE = 'lidar1.ply';
+const DATA_FILE = 'lidar1.csv';
 const MAX_POINTS = 400000; // downsample very large clouds so the browser stays responsive
 
 function parseCSVPointCloud(text) {
