@@ -156,14 +156,25 @@ footer{padding:30px 32px; text-align:center; font-size:12px; color:var(--ink-sof
   <h2 class="section-title">GIS &amp; spatial analytics</h2>
   <p class="data-topic-blurb">Add a short note here about the GIS layers and spatial methods used.</p>
   <div class="gallery-grid">
-    <figure><img src="gis1.jpg" alt="GIS layer 1"><figcaption>Caption goes here</figcaption></figure>
-    <figure><img src="gis2.jpg" alt="GIS layer 2"><figcaption>Caption goes here</figcaption></figure>
+    <figure><img data-base="gis1" data-tried="0" onerror="tryNextExt(this)" src="gis1.png" alt="GIS layer 1"><figcaption>Caption goes here</figcaption></figure>
+    <figure><img data-base="gis2" data-tried="0" onerror="tryNextExt(this)" src="gis2.png" alt="GIS layer 2"><figcaption>Caption goes here</figcaption></figure>
   </div>
 </section>
 
 <footer>© <span id="yr"></span> Kanchan Sharma .</footer>
 
 <script>
+// Auto-detects whichever image extension you actually uploaded (png, jpg, jpeg).
+function tryNextExt(img){
+  const exts = ['png','jpg','jpeg'];
+  let tried = parseInt(img.dataset.tried || '0', 10) + 1;
+  img.dataset.tried = tried;
+  if (tried < exts.length){
+    img.src = img.dataset.base + '.' + exts[tried];
+  } else {
+    img.onerror = null;
+  }
+}
 document.getElementById('yr').textContent = new Date().getFullYear();
 const root = document.documentElement;
 const toggle = document.getElementById('modeToggle');
