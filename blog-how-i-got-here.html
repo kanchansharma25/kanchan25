@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>How I Got Here — Kanchan Sharma</title>
+<meta name="description" content="From a government school in a small village to a PhD in data science — Kanchan Sharma.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+
+<style>
+:root{
+  --bg:#0B0C10;
+  --bg-2:#141620;
+  --surface:#15171F;
+  --ink:#F5F4F0;
+  --ink-soft:#A7ABC0;
+  --line:#262838;
+  --accent:#E8871E;
+  --accent-2:#6B8F71;
+  --navy:#8FA0F0;
+  --radius:3px;
+  color-scheme: dark;
+}
+html.light{
+  --bg:#F7F5EF;
+  --bg-2:#EFEBDF;
+  --surface:#FFFFFF;
+  --ink:#1B1D2B;
+  --ink-soft:#5B5F73;
+  --line:#E1DCCC;
+  --accent:#C96A0E;
+  --accent-2:#4C6E52;
+  --navy:#1E2761;
+  color-scheme: light;
+}
+
+*{box-sizing:border-box; margin:0; padding:0;}
+html{scroll-behavior:smooth;}
+body{background:var(--bg); color:var(--ink); font-family:'Inter',sans-serif; line-height:1.6; transition:background .25s, color .25s;}
+h1,h2,h3,h4{font-family:'Fraunces',serif; font-weight:600; letter-spacing:-.01em; color:var(--ink);}
+a{color:inherit; text-decoration:none;}
+.mono{font-family:'IBM Plex Mono',monospace;}
+img{max-width:100%; display:block;}
+:focus-visible{outline:2px solid var(--accent); outline-offset:2px;}
+@media (prefers-reduced-motion:reduce){*{transition:none !important; animation:none !important; scroll-behavior:auto !important;}}
+
+header{position:sticky; top:0; z-index:200; background:rgba(11,12,16,.86); backdrop-filter:blur(10px); border-bottom:1px solid var(--line);}
+html.light header{background:rgba(247,245,239,.88);}
+.nav-wrap{max-width:1240px; margin:0 auto; display:flex; align-items:center; justify-content:space-between; padding:18px 32px;}
+.logo{font-family:'Fraunces',serif; font-size:19px; font-weight:600;}
+nav.mainnav{display:flex; align-items:center; gap:6px;}
+nav.mainnav > .navitem{position:relative;}
+nav.mainnav a.toplink, nav.mainnav button.toplink{
+  background:none; border:none; cursor:pointer; font-family:'Inter',sans-serif;
+  color:var(--ink-soft); font-size:14.5px; font-weight:500; padding:9px 13px; border-radius:20px;
+  display:flex; align-items:center; gap:5px;
+}
+nav.mainnav a.toplink:hover, nav.mainnav button.toplink:hover{color:var(--ink); background:var(--bg-2);}
+.caret{font-size:10px; opacity:.7;}
+.dropdown{
+  position:absolute; top:calc(100% + 8px); left:0; min-width:220px;
+  background:var(--surface); border:1px solid var(--line); border-radius:8px;
+  padding:8px; display:none; flex-direction:column; gap:2px; box-shadow:0 12px 30px rgba(0,0,0,.35);
+}
+.navitem:hover .dropdown, .navitem:focus-within .dropdown{display:flex;}
+.dropdown a{padding:9px 12px; font-size:13.8px; border-radius:6px; color:var(--ink-soft);}
+.dropdown a:hover{background:var(--bg-2); color:var(--ink);}
+.nav-right{display:flex; align-items:center; gap:10px;}
+.icon-btn{
+  width:36px; height:36px; border-radius:50%; border:1px solid var(--line); background:var(--surface);
+  display:flex; align-items:center; justify-content:center; cursor:pointer; font-size:15px; color:var(--ink-soft);
+}
+.icon-btn:hover{color:var(--accent); border-color:var(--accent);}
+
+#navcheck{display:none;}
+.hamburger{display:none;}
+
+.section{max-width:760px; margin:0 auto; padding:88px 32px;}
+.eyebrow{font-family:'IBM Plex Mono',monospace; font-size:11.5px; letter-spacing:.12em; text-transform:uppercase; color:var(--accent); margin-bottom:14px; display:flex; align-items:center; gap:10px;}
+.back-link{display:inline-flex; align-items:center; gap:6px; font-size:13.5px; font-weight:600; color:var(--ink-soft); margin-bottom:26px;}
+.back-link:hover{color:var(--accent);}
+
+.post-title{font-size:clamp(30px,4vw,44px); line-height:1.1; margin-bottom:14px;}
+.post-meta{font-family:'IBM Plex Mono',monospace; font-size:12.5px; color:var(--ink-soft); margin-bottom:36px;}
+
+.post-photo{width:100%; max-width:480px; aspect-ratio:4/3; border-radius:8px; overflow:hidden; border:1px solid var(--line); background:var(--surface); margin-bottom:40px;}
+.post-photo img{width:100%; height:100%; object-fit:cover;}
+
+.post-body p{font-size:16.5px; color:var(--ink); margin-bottom:22px;}
+
+footer{padding:30px 32px; text-align:center; font-size:12px; color:var(--ink-soft); font-family:'IBM Plex Mono',monospace;}
+
+@media (max-width:768px){
+  nav.mainnav{display:none;}
+  .hamburger{display:flex; width:36px; height:36px; border:1px solid var(--line); border-radius:6px; align-items:center; justify-content:center; cursor:pointer; background:var(--surface);}
+  .hamburger span{display:block; width:16px; height:1.5px; background:var(--ink); position:relative;}
+  .hamburger span::before, .hamburger span::after{content:''; position:absolute; width:16px; height:1.5px; background:var(--ink); left:0;}
+  .hamburger span::before{top:-5px;} .hamburger span::after{top:5px;}
+  #navcheck:checked ~ header nav.mainnav{
+    display:flex; flex-direction:column; align-items:stretch; position:fixed; top:66px; left:0; right:0; bottom:0;
+    background:var(--bg); padding:20px; overflow-y:auto; gap:4px;
+  }
+  #navcheck:checked ~ header .navitem{width:100%;}
+  #navcheck:checked ~ header .dropdown{position:static; display:flex !important; border:none; padding-left:14px; box-shadow:none;}
+  .section{padding:56px 20px;}
+}
+</style>
+</head>
+<body>
+
+<input type="checkbox" id="navcheck">
+
+<header>
+  <div class="nav-wrap">
+    <a href="index.html" class="logo">Kanchan Sharma</a>
+
+    <nav class="mainnav">
+      <div class="navitem"><a href="index.html#about" class="toplink">About</a></div>
+      <div class="navitem">
+        <button class="toplink">Academics <span class="caret">▾</span></button>
+        <div class="dropdown">
+          <a href="academics.html#education">Education</a>
+          <a href="academics.html#coursework">Coursework</a>
+          <a href="academics.html#awards">Awards &amp; Achievements</a>
+          <a href="academics.html#skills">Skills</a>
+          <a href="academics.html#experience">Experience</a>
+        </div>
+      </div>
+      <div class="navitem">
+        <button class="toplink">Research <span class="caret">▾</span></button>
+        <div class="dropdown">
+          <a href="research.html#research">Research</a>
+          <a href="research.html#projects">Current Projects</a>
+          <a href="research.html#publications">Publications</a>
+        </div>
+      </div>
+      <div class="navitem"><a href="conferences.html" class="toplink">Conferences &amp; Talks</a></div>
+      <div class="navitem"><a href="blog.html" class="toplink">Blog</a></div>
+      <div class="navitem"><a href="data.html" class="toplink">Data</a></div>
+      <div class="navitem"><a href="cv.html" class="toplink">CV &amp; Downloads</a></div>
+      <div class="navitem"><a href="index.html#contact" class="toplink">Contact</a></div>
+    </nav>
+
+    <div class="nav-right">
+      <div class="icon-btn" id="modeToggle" role="button" tabindex="0" aria-label="Toggle theme">◐</div>
+      <label for="navcheck" class="hamburger"><span></span></label>
+    </div>
+  </div>
+</header>
+
+<section class="section">
+  <a href="blog.html" class="back-link">← Back to Blog</a>
+  <div class="eyebrow">Blog</div>
+  <h1 class="post-title">How I Got Here</h1>
+  <p class="post-meta">First post</p>
+
+  <div class="post-photo">
+    <img src="k.jpeg" alt="Kanchan Sharma">
+  </div>
+
+  <div class="post-body">
+    <p>I grew up in a small village and went to a government school. Like a lot of government schools, we didn't have enough teachers. For a while, our PT teacher was the one teaching us maths. That should tell you enough. Most of my classmates couldn't even do basic calculations. I still remember one day our science teacher asked the class what a "mean" was, and nobody could answer. Not a single hand went up.</p>
+
+    <p>I was the topper of that class. But it wasn't because of the school. It was because of my older brother. He used to teach me at home, maths, science, even English, long before any teacher did. So I already knew the basics. Just not enough of them.</p>
+
+    <p>Then, in 9th standard, we got a new maths teacher, and things changed. He spent the whole summer holiday teaching us things we should have learned years earlier, because our board exams were only a few months away. That summer, for the first time, I actually enjoyed a subject. I loved geometry especially, proving something is true, step by step, until it just makes sense. I scored 94 out of 100 in maths that year. And for the first time, every student in our class passed the subject.</p>
+
+    <p>That result decided a lot for me. I took maths in 11th, got a free seat in a private school because of my marks, and stayed the topper there too. By the end of it, I had a seat in a government college and a scholarship.</p>
+
+    <p>If you had told me, in my first year of college, that I'd one day do a PhD in data science at a research institute, I would have laughed. My English wasn't good. I could barely speak clearly in front of people. But my brother kept telling me I could crack the IIT JAM exam. I didn't fully believe him, but I decided to try anyway.</p>
+
+    <p>Then, in my second year, the pandemic hit and everything shut down. I was stuck at home and I was depressed, even if I didn't really have the words for it back then. I just wanted to get away. Not to anywhere specific, just away. The only escape I had was that exam. So I studied alone, in the same house I wanted to leave. I cleared JAM that year, but my rank wasn't good enough for an IIT.</p>
+
+    <p>I took a year off and tried again. This time it worked. I got a good rank and got into IIT Kanpur.</p>
+
+    <p>But getting in didn't mean things got easy. It was the first time I had left my state, and reality hit hard. I quickly realized I wasn't as good at pure mathematics as I thought. My grades in first year were bad. Same in third semester. For a while, I honestly thought I might not make it through.</p>
+
+    <p>But I didn't give up. I started picking subjects I actually liked, instead of what I thought I should study. One of them was mathematical biology, taught by Professor Malay Banerjee. He believed in me at a time I really needed someone to. That semester, my grades came back up, not because the subject was easy, but because I finally felt like I had something to offer again.</p>
+
+    <p>Even then, I didn't know what I wanted to do with my life. I didn't think I wanted a career in mathematics or research. Maybe teaching. Maybe a corporate job. I tried for NET-JRF and didn't qualify. Another gap year. Another low period. Eventually I cleared GATE and gave a lot of interviews, but none of them worked out.</p>
+
+    <p>By the time a friend told me about a PhD in data science at IISER Bhopal, I had almost given up hope. I filled the form anyway. Went for the interview anyway. And somehow, against a lot of odds, I got selected.</p>
+
+    <p>That's how someone who once struggled with basic maths in a village school with barely any teachers ended up doing a PhD in data science, now working on how we can make cities safer and easier to walk through.</p>
+
+    <p>I won't say the depression just went away once things started working out. It still comes and goes. Some days are harder than others. But I've stopped expecting my life to be a straight line. The low days are part of the story too. That's just what it means to actually live a life, not just tell a neat version of it.</p>
+  </div>
+</section>
+
+<footer>© <span id="yr"></span> Kanchan Sharma .</footer>
+
+<script>
+document.getElementById('yr').textContent = new Date().getFullYear();
+const root = document.documentElement;
+const toggle = document.getElementById('modeToggle');
+function setMode(light){
+  root.classList.toggle('light', light);
+  toggle.textContent = light ? '☾' : '◐';
+  localStorage.setItem('kanchan-theme', light ? 'light' : 'dark');
+}
+const saved = localStorage.getItem('kanchan-theme');
+setMode(saved === 'light');
+toggle.addEventListener('click', () => setMode(!root.classList.contains('light')));
+toggle.addEventListener('keydown', e => { if(e.key==='Enter'||e.key===' '){ e.preventDefault(); toggle.click(); } });
+document.querySelectorAll('nav.mainnav a').forEach(a => a.addEventListener('click', () => { document.getElementById('navcheck').checked = false; }));
+</script>
+</body>
+</html>
