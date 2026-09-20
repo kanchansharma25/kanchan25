@@ -174,8 +174,9 @@ a.card{cursor:pointer;}
 .exp-item .org{font-size:13px; color:var(--accent-2); margin-bottom:8px;}
 .exp-item p{font-size:13.5px; color:var(--ink-soft);}
 
-.event-photo{width:96px; height:96px; border:1px solid var(--line); border-radius:6px; overflow:hidden; background:var(--surface); margin-bottom:12px;}
+.event-photo{width:72px; height:72px; flex:0 0 auto; border:1px solid var(--line); border-radius:6px; overflow:hidden; background:var(--surface);}
 .event-photo img{width:100%; height:100%; object-fit:cover; display:block;}
+.exp-item-row{display:flex; align-items:flex-start; gap:16px;}
 
 .cv-box{border:1px solid var(--line); border-radius:8px; background:var(--surface); padding:36px; display:flex; justify-content:space-between; align-items:center; gap:28px; flex-wrap:wrap;}
 .cv-box h3{font-size:19px; margin-bottom:8px;}
@@ -276,11 +277,13 @@ footer{padding:30px 32px; text-align:center; font-size:12px; color:var(--ink-sof
   <h2 class="section-title">Presentations</h2>
   <div class="exp-item">
     <div class="period"></div>
-    <div>
+    <div class="exp-item-row">
       <div class="event-photo"><img src="symp1.png" alt="Symposium on AI in Energy Systems"></div>
-      <h4>Symposium on AI in Energy Systems</h4>
-      <div class="org">IISER Bhopal</div>
-      <p>Attended.</p>
+      <div>
+        <h4>Symposium on AI in Energy Systems</h4>
+        <div class="org">IISER Bhopal</div>
+        <p>Attended.</p>
+      </div>
     </div>
   </div>
 </section>
