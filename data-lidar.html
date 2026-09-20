@@ -228,7 +228,7 @@ function parseCSVPointCloud(text) {
 
   const total = dataLines.length;
   const step = Math.max(1, Math.floor(total / MAX_POINTS));
-  const positions = [];
+  const rawPositions = [];
   const colors = [];
   const hasColor = colIndex.r >= 0 && colIndex.g >= 0 && colIndex.b >= 0;
   let colorMax = 1;
@@ -239,7 +239,7 @@ function parseCSVPointCloud(text) {
     const y = parseFloat(cells[colIndex.y]);
     const z = parseFloat(cells[colIndex.z]);
     if (Number.isNaN(x) || Number.isNaN(y) || Number.isNaN(z)) continue;
-    positions.push(x, y, z);
+    rawPositions.push(x, y, z);
     if (hasColor) {
       const r = parseFloat(cells[colIndex.r]);
       const g = parseFloat(cells[colIndex.g]);
@@ -249,7 +249,19 @@ function parseCSVPointCloud(text) {
     }
   }
 
-  if (!positions.length) throw new Error('No numeric point rows found');
+  if (!rawPositions.length) throw new Error('No numeric point rows found');
+
+  // Real-world survey coordinates (e.g. UTM eastings/northings in the hundreds of
+  // thousands) lose too much precision in a 32-bit float buffer, which makes the
+  // cloud look noisy/exploded. Subtract an origin (the first point) BEFORE building
+  // the buffer so all stored values are small, then re-center properly afterwards.
+  const ox = rawPositions[0], oy = rawPositions[1], oz = rawPositions[2];
+  const positions = new Float32Array(rawPositions.length);
+  for (let i = 0; i < rawPositions.length; i += 3) {
+    positions[i] = rawPositions[i] - ox;
+    positions[i + 1] = rawPositions[i + 1] - oy;
+    positions[i + 2] = rawPositions[i + 2] - oz;
+  }
 
   const geometry = new THREE.BufferGeometry();
   geometry.setAttribute('position', new THREE.Float32BufferAttribute(positions, 3));
@@ -290,10 +302,40 @@ if (container) {
   dl.position.set(1, 1, 1);
   scene.add(dl);
 
-  fetch(DATA_FILE)
-    .then(res => {
+  async function fetchWithProgress(url) {
+    const res = await fetch(url);
+    if (!res.ok || !res.body) {
       if (!res.ok) throw new Error('not found');
-      return res.text();
+      return res.text(); // fallback if streaming isn't supported
+    }
+    const contentLength = +res.headers.get('Content-Length');
+    const reader = res.body.getReader();
+    const chunks = [];
+    let received = 0;
+    while (true) {
+      const { done, value } = await reader.read();
+      if (done) break;
+      chunks.push(value);
+      received += value.length;
+      if (contentLength) {
+        const pct = Math.round((received / contentLength) * 100);
+        hint.textContent = 'Downloading point cloud… ' + pct + '%';
+      } else {
+        hint.textContent = 'Downloading point cloud… ' + (received / 1e6).toFixed(1) + ' MB';
+      }
+    }
+    const all = new Uint8Array(received);
+    let pos = 0;
+    for (const chunk of chunks) { all.set(chunk, pos); pos += chunk.length; }
+    return new TextDecoder('utf-8').decode(all);
+  }
+
+  fetchWithProgress(DATA_FILE)
+    .then(text => {
+      hint.textContent = 'Parsing point cloud…';
+      // yield one frame so the "Parsing…" text actually paints before the
+      // (synchronous, potentially heavy) parse blocks the main thread
+      return new Promise(resolve => setTimeout(() => resolve(text), 30));
     })
     .then(text => {
       const { geometry, hasColor } = parseCSVPointCloud(text);
@@ -327,6 +369,7 @@ if (container) {
       hint.style.display = 'none';
     })
     .catch(err => {
+      console.error(err);
       hint.innerHTML = 'Point cloud not found or could not be read.<br>Make sure <strong>' + DATA_FILE + '</strong> is at the repo root and contains x,y,z (and optionally r,g,b) columns.';
     });
 
