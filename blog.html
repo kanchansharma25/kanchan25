@@ -114,6 +114,15 @@ a.card{cursor:pointer;}
 .card p{font-size:13.8px; color:var(--ink-soft);}
 .card .go{margin-top:auto; padding-top:6px; font-size:13px; font-weight:600; color:var(--accent);}
 
+.post-list{display:flex; flex-direction:column; gap:0;}
+.post-row{display:block; padding:26px 0; border-bottom:1px solid var(--line);}
+.post-row:first-child{border-top:1px solid var(--line);}
+.post-row .post-date{font-family:'IBM Plex Mono',monospace; font-size:12px; color:var(--ink-soft); margin-bottom:8px;}
+.post-row h3{font-size:21px; margin-bottom:8px;}
+.post-row p{font-size:14.5px; color:var(--ink-soft); max-width:640px;}
+.post-row .read-more{display:inline-block; margin-top:10px; font-size:13.5px; font-weight:600; color:var(--accent);}
+.post-row:hover h3{color:var(--accent);}
+
 .highlights-wrap{display:flex; flex-direction:column; gap:20px;}
 .highlights-slider{display:flex; gap:20px; overflow-x:auto; scroll-snap-type:x mandatory; padding-bottom:4px;}
 .highlight-card{
@@ -271,7 +280,16 @@ footer{padding:30px 32px; text-align:center; font-size:12px; color:var(--ink-sof
 <section class="section" id="blog" style="border-top:1px solid var(--line);">
   <div class="eyebrow">Blog</div>
   <h2 class="section-title">Research notes</h2>
-  <p class="section-sub">Coming soon.</p>
+  <p class="section-sub">Notes on my research, and occasionally, my journey.</p>
+
+  <div class="post-list">
+    <a href="blog-how-i-got-here.html" class="post-row">
+      <div class="post-date">First post</div>
+      <h3>How I Got Here</h3>
+      <p>From a government school in a small village with barely enough teachers, to a PhD in data science — on the low days, the lucky breaks, and the people who believed in me along the way.</p>
+      <span class="read-more">Read more →</span>
+    </a>
+  </div>
 </section>
 
 <footer>© <span id="yr"></span> Kanchan Sharma .</footer>
