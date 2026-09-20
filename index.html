@@ -310,27 +310,6 @@ footer{padding:30px 32px; text-align:center; font-size:12px; color:var(--ink-sof
         <a class="highlight-link" href="https://lnkd.in/p/dM6ycHVU" target="_blank" rel="noopener">View announcement →</a>
       </article>
 
-      <article class="highlight-card">
-        <div class="highlight-top">
-          <span class="highlight-tag">Symposium · IISER Bhopal</span>
-          <span class="highlight-date">25 July 2026</span>
-        </div>
-        <h3>Symposium on AI in Energy Systems</h3>
-        <p>Attended the Symposium on AI in Energy Systems at IISER Bhopal, featuring talks, discussions, student presentations, and a poster session.</p>
-        <a class="highlight-link" href="https://www.iiserb.ac.in/assets/all_upload/events/Symposium_AI_in_Energy_Systems.pdf" target="_blank" rel="noopener">View event details →</a>
-      </article>
-
-    </div>
-
-    <div class="highlights-controls">
-      <div class="highlight-dots">
-        <button class="highlight-dot active" aria-label="Show highlight 1"></button>
-        <button class="highlight-dot" aria-label="Show highlight 2"></button>
-      </div>
-      <div class="highlight-arrows">
-        <button class="highlight-arrow" id="highlightPrev" aria-label="Previous highlight">←</button>
-        <button class="highlight-arrow" id="highlightNext" aria-label="Next highlight">→</button>
-      </div>
     </div>
   </div>
 </section>
@@ -391,34 +370,6 @@ setMode(saved === 'light');
 toggle.addEventListener('click', () => setMode(!root.classList.contains('light')));
 toggle.addEventListener('keydown', e => { if(e.key==='Enter'||e.key===' '){ e.preventDefault(); toggle.click(); } });
 document.querySelectorAll('nav.mainnav a').forEach(a => a.addEventListener('click', () => { document.getElementById('navcheck').checked = false; }));
-
-/* ---------- Highlights Slider ---------- */
-const highlightsSlider = document.getElementById('highlightsSlider');
-const highlightCards = highlightsSlider.querySelectorAll('.highlight-card');
-const highlightDots = document.querySelectorAll('.highlight-dot');
-const highlightPrev = document.getElementById('highlightPrev');
-const highlightNext = document.getElementById('highlightNext');
-let highlightIndex = 0;
-function showHighlight(index){
-  if(index < 0) index = highlightCards.length - 1;
-  if(index >= highlightCards.length) index = 0;
-  highlightIndex = index;
-  highlightsSlider.scrollTo({ left: highlightCards[index].offsetLeft - highlightsSlider.offsetLeft, behavior: 'smooth' });
-  highlightDots.forEach((dot, i) => { dot.classList.toggle('active', i === index); });
-}
-highlightNext.addEventListener('click', () => { showHighlight(highlightIndex + 1); });
-highlightPrev.addEventListener('click', () => { showHighlight(highlightIndex - 1); });
-highlightDots.forEach((dot, index) => { dot.addEventListener('click', () => { showHighlight(index); }); });
-highlightsSlider.addEventListener('scroll', () => {
-  const scrollLeft = highlightsSlider.scrollLeft;
-  let closestIndex = 0; let closestDistance = Infinity;
-  highlightCards.forEach((card, index) => {
-    const distance = Math.abs(card.offsetLeft - highlightsSlider.offsetLeft - scrollLeft);
-    if(distance < closestDistance){ closestDistance = distance; closestIndex = index; }
-  });
-  highlightIndex = closestIndex;
-  highlightDots.forEach((dot, i) => { dot.classList.toggle('active', i === closestIndex); });
-});
 
 /* ---------- Contact form: open the visitor's email client with a prefilled message ---------- */
 document.getElementById('contactForm').addEventListener('submit', function(e){
