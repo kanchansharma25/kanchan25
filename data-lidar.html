@@ -183,14 +183,83 @@ document.querySelectorAll('nav.mainnav a').forEach(a => a.addEventListener('clic
 
 <script type="module">
 // ---- LiDAR point-cloud viewer (Three.js) ----
-// Put your exported point cloud file at the repo root as: lidar1.ply
+// Reads a CSV point cloud from the repo root: lidar1.ply
+// (the file just needs to contain CSV data — the extension doesn't matter to this parser)
+// Auto-detects columns: looks for x/y/z and optional r,g,b (or red,green,blue) in the header row.
+// If there's no header, it assumes the column order is x,y,z[,r,g,b].
 import * as THREE from 'https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js';
 import { OrbitControls } from 'https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/controls/OrbitControls.js';
-import { PLYLoader } from 'https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/loaders/PLYLoader.js';
 
 const container = document.getElementById('lidarViewer');
 const hint = document.getElementById('lidarHint');
-const PLY_FILE = 'lidar1.ply';
+const DATA_FILE = 'lidar1.ply';
+const MAX_POINTS = 400000; // downsample very large clouds so the browser stays responsive
+
+function parseCSVPointCloud(text) {
+  const lines = text.split(/\r\n|\n|\r/).filter(l => l.trim().length > 0);
+  if (!lines.length) throw new Error('Empty file');
+
+  // Detect delimiter from the first line
+  const firstLine = lines[0];
+  const delim = firstLine.includes(',') ? ',' : (firstLine.includes('\t') ? '\t' : /\s+/);
+
+  const splitLine = (line) => (delim instanceof RegExp ? line.trim().split(delim) : line.split(delim)).map(s => s.trim());
+
+  let header = splitLine(firstLine);
+  let hasHeader = header.some(cell => isNaN(parseFloat(cell)));
+
+  let colIndex = { x: 0, y: 1, z: 2, r: -1, g: -1, b: -1 };
+  let dataLines = lines;
+
+  if (hasHeader) {
+    const lower = header.map(h => h.toLowerCase());
+    const find = (...names) => lower.findIndex(h => names.includes(h));
+    colIndex.x = find('x', 'x_coord', 'xcoord', 'easting');
+    colIndex.y = find('y', 'y_coord', 'ycoord', 'northing');
+    colIndex.z = find('z', 'z_coord', 'zcoord', 'elevation', 'height');
+    colIndex.r = find('r', 'red');
+    colIndex.g = find('g', 'green');
+    colIndex.b = find('b', 'blue');
+    if (colIndex.x < 0 || colIndex.y < 0 || colIndex.z < 0) {
+      // fall back to first three columns if names weren't recognized
+      colIndex.x = 0; colIndex.y = 1; colIndex.z = 2;
+    }
+    dataLines = lines.slice(1);
+  }
+
+  const total = dataLines.length;
+  const step = Math.max(1, Math.floor(total / MAX_POINTS));
+  const positions = [];
+  const colors = [];
+  const hasColor = colIndex.r >= 0 && colIndex.g >= 0 && colIndex.b >= 0;
+  let colorMax = 1;
+
+  for (let i = 0; i < total; i += step) {
+    const cells = splitLine(dataLines[i]);
+    const x = parseFloat(cells[colIndex.x]);
+    const y = parseFloat(cells[colIndex.y]);
+    const z = parseFloat(cells[colIndex.z]);
+    if (Number.isNaN(x) || Number.isNaN(y) || Number.isNaN(z)) continue;
+    positions.push(x, y, z);
+    if (hasColor) {
+      const r = parseFloat(cells[colIndex.r]);
+      const g = parseFloat(cells[colIndex.g]);
+      const b = parseFloat(cells[colIndex.b]);
+      if (r > colorMax || g > colorMax || b > colorMax) colorMax = 255;
+      colors.push(r, g, b);
+    }
+  }
+
+  if (!positions.length) throw new Error('No numeric point rows found');
+
+  const geometry = new THREE.BufferGeometry();
+  geometry.setAttribute('position', new THREE.Float32BufferAttribute(positions, 3));
+  if (hasColor) {
+    const normalized = colors.map(c => c / colorMax);
+    geometry.setAttribute('color', new THREE.Float32BufferAttribute(normalized, 3));
+  }
+  return { geometry, hasColor };
+}
 
 if (container) {
   const scene = new THREE.Scene();
@@ -222,14 +291,15 @@ if (container) {
   dl.position.set(1, 1, 1);
   scene.add(dl);
 
-  const loader = new PLYLoader();
-  loader.load(
-    PLY_FILE,
-    (geometry) => {
+  fetch(DATA_FILE)
+    .then(res => {
+      if (!res.ok) throw new Error('not found');
+      return res.text();
+    })
+    .then(text => {
+      const { geometry, hasColor } = parseCSVPointCloud(text);
       geometry.computeBoundingBox();
-      geometry.computeVertexNormals();
 
-      const hasColor = !!geometry.getAttribute('color');
       const material = new THREE.PointsMaterial({
         size: 0.015,
         sizeAttenuation: true,
@@ -256,17 +326,10 @@ if (container) {
       controls.update();
 
       hint.style.display = 'none';
-    },
-    (xhr) => {
-      if (xhr.lengthComputable) {
-        const pct = Math.round((xhr.loaded / xhr.total) * 100);
-        hint.textContent = 'Loading point cloud… ' + pct + '%';
-      }
-    },
-    (err) => {
-      hint.innerHTML = 'Point cloud not found yet.<br>Upload your file as <strong>' + PLY_FILE + '</strong> to the repo root to see it here.';
-    }
-  );
+    })
+    .catch(err => {
+      hint.innerHTML = 'Point cloud not found or could not be read.<br>Make sure <strong>' + DATA_FILE + '</strong> is at the repo root and contains x,y,z (and optionally r,g,b) columns.';
+    });
 
   function onResize() {
     const w = container.clientWidth, h = container.clientHeight;
