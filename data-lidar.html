@@ -92,6 +92,19 @@ nav.mainnav a.toplink:hover, nav.mainnav button.toplink:hover{color:var(--ink); 
 .lidar-viewer{position:relative; width:100%; aspect-ratio:16/9; border:1px solid var(--line); border-radius:8px; overflow:hidden; background:#05060a;}
 .lidar-viewer canvas{display:block; width:100%; height:100%;}
 .lidar-hint{position:absolute; inset:0; display:flex; align-items:center; justify-content:center; text-align:center; padding:24px; color:var(--ink-soft); font-family:'IBM Plex Mono',monospace; font-size:12.5px; pointer-events:none;}
+.lidar-controls{display:flex; justify-content:space-between; align-items:center; margin-top:16px;}
+.lidar-caption{font-size:14px; color:var(--ink-soft);}
+.lidar-caption strong{color:var(--ink); font-weight:600;}
+.lidar-dots{display:flex; gap:8px;}
+.lidar-dot{width:8px; height:8px; border-radius:50%; border:none; background:var(--line); cursor:pointer; padding:0;}
+.lidar-dot.active{background:var(--accent);}
+.lidar-arrows{display:flex; gap:8px;}
+.lidar-arrow{
+  width:34px; height:34px; border-radius:50%; border:1px solid var(--line); background:var(--surface);
+  display:flex; align-items:center; justify-content:center; cursor:pointer; color:var(--ink-soft);
+}
+.lidar-arrow:hover{color:var(--accent); border-color:var(--accent);}
+@media (max-width:600px){ .lidar-controls{flex-direction:column; align-items:flex-start; gap:14px;} }
 
 footer{padding:30px 32px; text-align:center; font-size:12px; color:var(--ink-soft); font-family:'IBM Plex Mono',monospace;}
 
@@ -157,9 +170,19 @@ footer{padding:30px 32px; text-align:center; font-size:12px; color:var(--ink-sof
 <section class="section" style="border-top:1px solid var(--line);">
   <div class="eyebrow">Data — LiDAR point cloud</div>
   <h2 class="section-title">LiDAR point cloud</h2>
-  <p class="data-topic-blurb">Drag to rotate, scroll to zoom, right-click drag to pan.</p>
+  <p class="data-topic-blurb">Drag to rotate, scroll to zoom, right-click drag to pan. Use the arrows or dots below to switch between scans.</p>
   <div class="lidar-viewer" id="lidarViewer">
     <div class="lidar-hint" id="lidarHint">Loading point cloud…</div>
+  </div>
+  <div class="lidar-controls">
+    <p class="lidar-caption" id="lidarCaption"></p>
+    <div style="display:flex; align-items:center; gap:16px;">
+      <div class="lidar-dots" id="lidarDots"></div>
+      <div class="lidar-arrows">
+        <button class="lidar-arrow" id="lidarPrev" aria-label="Previous scan">←</button>
+        <button class="lidar-arrow" id="lidarNext" aria-label="Next scan">→</button>
+      </div>
+    </div>
   </div>
 </section>
 
@@ -182,17 +205,31 @@ document.querySelectorAll('nav.mainnav a').forEach(a => a.addEventListener('clic
 </script>
 
 <script type="module">
-// ---- LiDAR point-cloud viewer (Three.js) ----
-// Put your exported point cloud file at the repo root as: lidar1.ply
+// ---- LiDAR point-cloud slider (Three.js) ----
+// Put your exported point cloud files at the repo root as: lidar1.ply, lidar2.ply, lidar3.ply, lidar4.ply
+// Edit the "caption" text below for each scan.
 import * as THREE from 'https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js';
 import { OrbitControls } from 'https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/controls/OrbitControls.js';
 import { PLYLoader } from 'https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/loaders/PLYLoader.js';
 
+const SCANS = [
+  { file: 'lidar1.ply', caption: 'Caption goes here' },
+  { file: 'lidar2.ply', caption: 'Caption goes here' },
+  { file: 'lidar3.ply', caption: 'Caption goes here' },
+  { file: 'lidar4.ply', caption: 'Caption goes here' },
+];
+
 const container = document.getElementById('lidarViewer');
 const hint = document.getElementById('lidarHint');
-const PLY_FILE = 'lidar1.ply';
+const captionEl = document.getElementById('lidarCaption');
+const dotsEl = document.getElementById('lidarDots');
+const prevBtn = document.getElementById('lidarPrev');
+const nextBtn = document.getElementById('lidarNext');
 
 if (container) {
+  let currentIndex = 0;
+  let currentPoints = null;
+
   const scene = new THREE.Scene();
   scene.background = new THREE.Color(0x05060a);
 
@@ -223,51 +260,88 @@ if (container) {
   scene.add(dl);
 
   const loader = new PLYLoader();
-  loader.load(
-    PLY_FILE,
-    (geometry) => {
-      geometry.computeBoundingBox();
-      geometry.computeVertexNormals();
 
-      const hasColor = !!geometry.getAttribute('color');
-      const material = new THREE.PointsMaterial({
-        size: 0.015,
-        sizeAttenuation: true,
-        vertexColors: hasColor,
-        color: hasColor ? 0xffffff : 0xE8871E
-      });
+  // Build dot indicators
+  SCANS.forEach((_, i) => {
+    const dot = document.createElement('button');
+    dot.className = 'lidar-dot' + (i === 0 ? ' active' : '');
+    dot.setAttribute('aria-label', 'Scan ' + (i + 1));
+    dot.addEventListener('click', () => loadScan(i));
+    dotsEl.appendChild(dot);
+  });
 
-      const points = new THREE.Points(geometry, material);
+  function updateDots() {
+    [...dotsEl.children].forEach((d, i) => d.classList.toggle('active', i === currentIndex));
+  }
 
-      // Center and scale the point cloud to fit the view nicely
-      const box = geometry.boundingBox;
-      const center = new THREE.Vector3();
-      box.getCenter(center);
-      points.position.sub(center);
+  function loadScan(index) {
+    currentIndex = (index + SCANS.length) % SCANS.length;
+    const scan = SCANS[currentIndex];
+    updateDots();
+    captionEl.innerHTML = '<strong>Scan ' + (currentIndex + 1) + ' of ' + SCANS.length + '.</strong> ' + scan.caption;
 
-      const size = new THREE.Vector3();
-      box.getSize(size);
-      const maxDim = Math.max(size.x, size.y, size.z) || 1;
-      const scale = 3 / maxDim;
-      points.scale.setScalar(scale);
-
-      scene.add(points);
-
-      camera.position.set(0, 0, maxDim * scale * 1.6 + 2);
-      controls.update();
-
-      hint.style.display = 'none';
-    },
-    (xhr) => {
-      if (xhr.lengthComputable) {
-        const pct = Math.round((xhr.loaded / xhr.total) * 100);
-        hint.textContent = 'Loading point cloud… ' + pct + '%';
-      }
-    },
-    (err) => {
-      hint.innerHTML = 'Point cloud not found yet.<br>Upload your file as <strong>' + PLY_FILE + '</strong> to the repo root to see it here.';
+    if (currentPoints) {
+      scene.remove(currentPoints);
+      currentPoints.geometry.dispose();
+      currentPoints.material.dispose();
+      currentPoints = null;
     }
-  );
+
+    hint.style.display = 'flex';
+    hint.textContent = 'Loading point cloud…';
+
+    loader.load(
+      scan.file,
+      (geometry) => {
+        geometry.computeBoundingBox();
+        geometry.computeVertexNormals();
+
+        const hasColor = !!geometry.getAttribute('color');
+        const material = new THREE.PointsMaterial({
+          size: 0.015,
+          sizeAttenuation: true,
+          vertexColors: hasColor,
+          color: hasColor ? 0xffffff : 0xE8871E
+        });
+
+        const points = new THREE.Points(geometry, material);
+
+        const box = geometry.boundingBox;
+        const center = new THREE.Vector3();
+        box.getCenter(center);
+        points.position.sub(center);
+
+        const size = new THREE.Vector3();
+        box.getSize(size);
+        const maxDim = Math.max(size.x, size.y, size.z) || 1;
+        const scale = 3 / maxDim;
+        points.scale.setScalar(scale);
+
+        scene.add(points);
+        currentPoints = points;
+
+        camera.position.set(0, 0, maxDim * scale * 1.6 + 2);
+        controls.target.set(0, 0, 0);
+        controls.update();
+
+        hint.style.display = 'none';
+      },
+      (xhr) => {
+        if (xhr.lengthComputable) {
+          const pct = Math.round((xhr.loaded / xhr.total) * 100);
+          hint.textContent = 'Loading point cloud… ' + pct + '%';
+        }
+      },
+      (err) => {
+        hint.innerHTML = 'Point cloud not found yet.<br>Upload your file as <strong>' + scan.file + '</strong> to the repo root to see it here.';
+      }
+    );
+  }
+
+  prevBtn.addEventListener('click', () => loadScan(currentIndex - 1));
+  nextBtn.addEventListener('click', () => loadScan(currentIndex + 1));
+
+  loadScan(0);
 
   function onResize() {
     const w = container.clientWidth, h = container.clientHeight;
