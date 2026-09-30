@@ -69,8 +69,8 @@ html.light header{background:rgba(247,245,239,.88);}
 .proj-actions{display:flex; gap:10px; justify-content:center; flex-wrap:wrap; margin-bottom:44px;}
 
 .proj-banner{max-width:1080px; margin:0 auto; padding:0 32px 72px;}
-.proj-banner-frame{width:100%; aspect-ratio:21/9; border:1px solid var(--line); border-radius:10px; overflow:hidden; background:var(--surface); display:flex; align-items:center; justify-content:center; color:var(--ink-soft); font-family:'IBM Plex Mono',monospace; font-size:12.5px; text-align:center; padding:20px;}
-.proj-banner-frame img{width:100%; height:100%; object-fit:cover;}
+.proj-banner-frame{width:100%; aspect-ratio:16/9; border:1px solid var(--line); border-radius:10px; overflow:hidden; background:var(--surface); display:flex; align-items:center; justify-content:center; color:var(--ink-soft); font-family:'IBM Plex Mono',monospace; font-size:12.5px; text-align:center; padding:20px;}
+.proj-banner-frame img, .proj-banner-frame video{width:100%; height:100%; object-fit:cover; display:block;}
 
 /* ---- Body sections ---- */
 .section{max-width:900px; margin:0 auto; padding:64px 32px; border-top:1px solid var(--line);}
@@ -151,10 +151,12 @@ footer{padding:30px 32px; text-align:center; font-size:12px; color:var(--ink-sof
   </div>
 </section>
 
-<!-- ====================== BANNER ====================== -->
+<!-- ====================== BANNER VIDEO ====================== -->
 <section class="proj-banner">
-  <div class="proj-banner-frame">
-    <img src="project-banner.jpg" alt="Project banner" onerror="this.parentElement.textContent='Banner image goes here — add project-banner.jpg to the repo root'">
+  <div class="proj-banner-frame" id="bannerFrame">
+    <video id="bannerVideo" controls playsinline preload="metadata" poster="project-banner.jpg">
+      <source src="video1.mp4" type="video/mp4">
+    </video>
   </div>
 </section>
 
@@ -284,6 +286,15 @@ const saved = localStorage.getItem('kanchan-theme');
 setMode(saved === 'light');
 toggle.addEventListener('click', () => setMode(!root.classList.contains('light')));
 toggle.addEventListener('keydown', e => { if(e.key==='Enter'||e.key===' '){ e.preventDefault(); toggle.click(); } });
+
+/* ---- Banner video fallback ---- */
+const bannerVideo = document.getElementById('bannerVideo');
+const bannerFrame = document.getElementById('bannerFrame');
+if (bannerVideo) {
+  bannerVideo.addEventListener('error', () => {
+    bannerFrame.textContent = 'Video goes here — add video1.mp4 to the repo root';
+  }, true);
+}
 
 /* ---- Dataset tabs ---- */
 const tabBtns = document.querySelectorAll('.tab-btn');
