@@ -1,0 +1,503 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>A Dataset for Scene Understanding to Plan Urban Areas for Better Quality of Life — Kanchan Sharma</title>
+<meta name="description" content="Project page — a dataset for scene understanding to plan urban areas for better quality of life, Kanchan Sharma, IISER Bhopal.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+
+<style>
+:root{
+  --bg:#0B0C10;
+  --bg-2:#141620;
+  --surface:#15171F;
+  --ink:#F5F4F0;
+  --ink-soft:#A7ABC0;
+  --line:#262838;
+  --accent:#E8871E;
+  --accent-2:#6B8F71;
+  --navy:#8FA0F0;
+  --radius:3px;
+  color-scheme: dark;
+}
+html.light{
+  --bg:#F7F5EF;
+  --bg-2:#EFEBDF;
+  --surface:#FFFFFF;
+  --ink:#1B1D2B;
+  --ink-soft:#5B5F73;
+  --line:#E1DCCC;
+  --accent:#C96A0E;
+  --accent-2:#4C6E52;
+  --navy:#1E2761;
+  color-scheme: light;
+}
+
+*{box-sizing:border-box; margin:0; padding:0;}
+html{scroll-behavior:smooth;}
+body{background:var(--bg); color:var(--ink); font-family:'Inter',sans-serif; line-height:1.6; transition:background .25s, color .25s;}
+h1,h2,h3,h4{font-family:'Fraunces',serif; font-weight:600; letter-spacing:-.01em; color:var(--ink);}
+a{color:inherit; text-decoration:none;}
+.mono{font-family:'IBM Plex Mono',monospace;}
+img{max-width:100%; display:block;}
+:focus-visible{outline:2px solid var(--accent); outline-offset:2px;}
+@media (prefers-reduced-motion:reduce){*{transition:none !important; animation:none !important; scroll-behavior:auto !important;}}
+
+header{position:sticky; top:0; z-index:200; background:rgba(11,12,16,.86); backdrop-filter:blur(10px); border-bottom:1px solid var(--line);}
+html.light header{background:rgba(247,245,239,.88);}
+.nav-wrap{max-width:1240px; margin:0 auto; display:flex; align-items:center; justify-content:space-between; padding:18px 32px;}
+.logo{font-family:'Fraunces',serif; font-size:19px; font-weight:600;}
+.nav-right{display:flex; align-items:center; gap:10px;}
+.icon-btn{
+  width:36px; height:36px; border-radius:50%; border:1px solid var(--line); background:var(--surface);
+  display:flex; align-items:center; justify-content:center; cursor:pointer; font-size:15px; color:var(--ink-soft);
+}
+.icon-btn:hover{color:var(--accent); border-color:var(--accent);}
+
+.btn{display:inline-flex; align-items:center; gap:8px; padding:11px 20px; border-radius:24px; font-size:13.5px; font-weight:600; cursor:pointer; border:1px solid transparent;}
+.btn-primary{background:var(--ink); color:var(--bg);}
+.btn-primary:hover{background:var(--accent); color:#fff;}
+.btn-outline{background:transparent; color:var(--ink); border-color:var(--line);}
+.btn-outline:hover{border-color:var(--ink);}
+
+/* ---- Project hero ---- */
+.proj-hero{max-width:900px; margin:0 auto; padding:72px 32px 0; text-align:center;}
+.proj-eyebrow{font-family:'IBM Plex Mono',monospace; font-size:11.5px; letter-spacing:.12em; text-transform:uppercase; color:var(--accent); margin-bottom:16px;}
+.proj-title{font-size:clamp(28px,4.2vw,42px); line-height:1.15; margin-bottom:28px;}
+.proj-actions{display:flex; gap:10px; justify-content:center; flex-wrap:wrap; margin-bottom:44px;}
+
+.proj-banner{max-width:1080px; margin:0 auto; padding:0 32px 72px;}
+.proj-banner-frame{width:100%; aspect-ratio:21/9; border:1px solid var(--line); border-radius:10px; overflow:hidden; background:var(--surface); display:flex; align-items:center; justify-content:center; color:var(--ink-soft); font-family:'IBM Plex Mono',monospace; font-size:12.5px; text-align:center; padding:20px;}
+.proj-banner-frame img{width:100%; height:100%; object-fit:cover;}
+
+/* ---- Body sections ---- */
+.section{max-width:900px; margin:0 auto; padding:64px 32px; border-top:1px solid var(--line);}
+.section-wide{max-width:1120px;}
+.section-title{font-size:clamp(22px,2.8vw,28px); margin-bottom:20px;}
+.section-sub{color:var(--ink-soft); max-width:640px; margin:-8px 0 26px; font-size:14.5px;}
+.section p{font-size:15.5px; color:var(--ink); margin-bottom:16px;}
+.section ul{margin:0 0 16px 20px; font-size:15.5px; color:var(--ink);}
+.section li{margin-bottom:8px;}
+
+/* ---- Input/Output flow ---- */
+.flow{display:flex; align-items:center; gap:0; margin-top:28px; flex-wrap:wrap;}
+.flow-col{flex:1; min-width:260px;}
+.flow-label{font-family:'IBM Plex Mono',monospace; font-size:11px; text-transform:uppercase; letter-spacing:.08em; color:var(--accent); margin-bottom:16px; text-align:center;}
+.flow-arrow{display:flex; align-items:center; justify-content:center; padding:0 24px; color:var(--accent); font-size:26px; flex:0 0 auto;}
+@media (max-width:768px){ .flow{flex-direction:column;} .flow-arrow{transform:rotate(90deg); padding:16px 0;} }
+
+.chip-grid{display:flex; flex-wrap:wrap; gap:10px; justify-content:center;}
+.chip{display:flex; align-items:center; gap:8px; padding:10px 16px; border:1px solid var(--line); border-radius:24px; background:var(--surface); font-size:13.5px; color:var(--ink); font-weight:500;}
+.chip svg{width:16px; height:16px; color:var(--accent); flex:0 0 auto;}
+.chip.goal{border-color:var(--accent-2); background:color-mix(in srgb, var(--accent-2) 12%, var(--surface));}
+.chip.goal svg{color:var(--accent-2);}
+
+.io-note{text-align:center; font-size:14px; color:var(--ink-soft); margin-top:28px; max-width:640px; margin-left:auto; margin-right:auto;}
+
+/* ---- Dataset tabs ---- */
+.tabs{display:flex; flex-wrap:wrap; gap:8px; margin-bottom:32px;}
+.tab-btn{
+  display:flex; align-items:center; gap:8px; padding:10px 18px; border-radius:24px;
+  border:1px solid var(--line); background:var(--surface); color:var(--ink-soft);
+  font-family:'Inter',sans-serif; font-size:13.5px; font-weight:600; cursor:pointer;
+}
+.tab-btn svg{width:15px; height:15px; flex:0 0 auto;}
+.tab-btn:hover{color:var(--ink); border-color:var(--ink-soft);}
+.tab-btn.active{background:var(--accent); border-color:var(--accent); color:#fff;}
+.tab-panel{display:none;}
+.tab-panel.active{display:block;}
+
+.gallery-grid{display:grid; grid-template-columns:repeat(4,1fr); gap:14px; margin-top:6px;}
+.gallery-grid figure{margin:0; border:1px solid var(--line); border-radius:8px; overflow:hidden; background:var(--surface);}
+.gallery-grid img{width:100%; aspect-ratio:4/3; object-fit:contain; display:block; background:var(--bg-2);}
+.gallery-grid figcaption{padding:8px 10px; font-size:12.5px; color:var(--ink-soft); border-top:1px solid var(--line);}
+@media (max-width:768px){ .gallery-grid{grid-template-columns:1fr 1fr;} }
+
+.lidar-viewer{position:relative; width:100%; aspect-ratio:16/9; border:1px solid var(--line); border-radius:8px; overflow:hidden; background:#05060a;}
+.lidar-viewer canvas{display:block; width:100%; height:100%;}
+.lidar-hint{position:absolute; inset:0; display:flex; align-items:center; justify-content:center; text-align:center; padding:24px; color:var(--ink-soft); font-family:'IBM Plex Mono',monospace; font-size:12.5px; pointer-events:none;}
+.lidar-caption{margin-top:12px; font-size:12.5px; color:var(--ink-soft); font-family:'IBM Plex Mono',monospace;}
+
+footer{padding:30px 32px; text-align:center; font-size:12px; color:var(--ink-soft); font-family:'IBM Plex Mono',monospace;}
+
+@media (max-width:768px){
+  .section{padding:48px 20px;}
+  .gallery-grid{grid-template-columns:1fr 1fr;}
+}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="nav-wrap">
+    <a href="index.html" class="logo">Kanchan Sharma</a>
+
+    <div class="nav-right">
+      <div class="icon-btn" id="modeToggle" role="button" tabindex="0" aria-label="Toggle theme">◐</div>
+    </div>
+  </div>
+</header>
+
+<!-- ====================== TITLE ====================== -->
+<section class="proj-hero">
+  <div class="proj-eyebrow">Ongoing Ph.D. Research</div>
+  <h1 class="proj-title">A Dataset for Scene Understanding to Plan Urban Areas for Better Quality of Life</h1>
+  <div class="proj-actions">
+    <a href="#dataset" class="btn btn-primary">Explore the dataset ↓</a>
+    <a href="https://github.com/kanchansharma25" class="btn btn-outline" target="_blank" rel="noopener">GitHub</a>
+    <a href="https://www.linkedin.com/in/kanchan-k-sharma-a59051318/" class="btn btn-outline" target="_blank" rel="noopener">LinkedIn</a>
+  </div>
+</section>
+
+<!-- ====================== BANNER ====================== -->
+<section class="proj-banner">
+  <div class="proj-banner-frame">
+    <img src="project-banner.jpg" alt="Project banner" onerror="this.parentElement.textContent='Banner image goes here — add project-banner.jpg to the repo root'">
+  </div>
+</section>
+
+<!-- ====================== OVERVIEW ====================== -->
+<section class="section" id="overview">
+  <h2 class="section-title">Overview</h2>
+  <p>I work on understanding what makes an urban street feel safe, lively, and pleasant, and using that understanding to suggest realistic changes that could improve it.</p>
+</section>
+
+<!-- ====================== WHAT I WORK WITH ====================== -->
+<section class="section" id="data-used">
+  <h2 class="section-title">What I work with</h2>
+  <ul>
+    <li><strong>Street-view panoramas</strong> — 360° street-level imagery.</li>
+    <li><strong>UAV imagery &amp; LiDAR point clouds</strong> — aerial captures used to measure buildings, roads, and canopy structure.</li>
+    <li><strong>GIS layers</strong> — road network and spatial data tying everything back to specific stretches of street.</li>
+  </ul>
+</section>
+
+<!-- ====================== DATASET ====================== -->
+<section class="section section-wide" id="dataset">
+  <h2 class="section-title">Dataset</h2>
+  <p class="section-sub">Samples of each data type I work with — browse them below, and explore the LiDAR point cloud directly in 3D.</p>
+
+  <div class="tabs" role="tablist">
+    <button class="tab-btn active" data-tab="streetview" role="tab" aria-selected="true">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h3l2-2h6l2 2h3v12H4z"/><circle cx="12" cy="13" r="3.2"/></svg>
+      Street-view
+    </button>
+    <button class="tab-btn" data-tab="uav" role="tab" aria-selected="false">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 3L3 6v15l6-3 6 3 6-3V3l-6 3-6-3z"/><path d="M9 3v15M15 6v15"/></svg>
+      UAV
+    </button>
+    <button class="tab-btn" data-tab="gis" role="tab" aria-selected="false">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s-6.5-6.1-6.5-11A6.5 6.5 0 0112 3.5 6.5 6.5 0 0118.5 10c0 4.9-6.5 11-6.5 11z"/><circle cx="12" cy="10" r="2.2"/></svg>
+      GIS &amp; spatial
+    </button>
+    <button class="tab-btn" data-tab="lidar" role="tab" aria-selected="false">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="5" cy="6" r="1.6"/><circle cx="12" cy="4" r="1.6"/><circle cx="19" cy="7" r="1.6"/><circle cx="6" cy="13" r="1.6"/><circle cx="13" cy="12" r="1.6"/><circle cx="18" cy="15" r="1.6"/><circle cx="8" cy="19" r="1.6"/><circle cx="15" cy="19" r="1.6"/></svg>
+      LiDAR
+    </button>
+  </div>
+
+  <div class="tab-panel active" id="panel-streetview">
+    <p class="section-sub" style="margin-top:0;">Street-view panoramic (360°) images of Azad Market, Bhopal.</p>
+    <div class="gallery-grid">
+      <figure><img src="svi1.jpg" alt="Street-view sample 1"><figcaption>1</figcaption></figure>
+      <figure><img src="svi2.jpg" alt="Street-view sample 2"><figcaption>2</figcaption></figure>
+      <figure><img src="svi3.jpg" alt="Street-view sample 3"><figcaption>3</figcaption></figure>
+      <figure><img src="svi4.jpg" alt="Street-view sample 4"><figcaption>4</figcaption></figure>
+    </div>
+  </div>
+
+  <div class="tab-panel" id="panel-uav">
+    <p class="section-sub" style="margin-top:0;">UAV images of Gehunkheda region, Bhopal.</p>
+    <div class="gallery-grid">
+      <figure><img src="uav1.png" alt="UAV capture 1"><figcaption>Thermal raster</figcaption></figure>
+      <figure><img src="uav2.png" alt="UAV capture 2"><figcaption>NDSM</figcaption></figure>
+      <figure><img src="uav3.png" alt="UAV capture 3"><figcaption>Semantic segmentation of RGB images</figcaption></figure>
+    </div>
+  </div>
+
+  <div class="tab-panel" id="panel-gis">
+    <p class="section-sub" style="margin-top:0;">Some maps on QGIS software, to analyse the data.</p>
+    <div class="gallery-grid">
+      <figure><img data-base="gis1" data-tried="0" onerror="tryNextExt(this)" src="gis1.png" alt="GIS layer 1"><figcaption>Road centerline extraction</figcaption></figure>
+      <figure><img data-base="gis2" data-tried="0" onerror="tryNextExt(this)" src="gis2.png" alt="GIS layer 2"><figcaption>Semantic segmentation of RGB UAV image of Gehunkheda region</figcaption></figure>
+    </div>
+  </div>
+
+  <div class="tab-panel" id="panel-lidar">
+    <p class="section-sub" style="margin-top:0;">LiDAR point cloud of a building — drag to rotate, scroll to zoom, right-click drag to pan.</p>
+    <div class="lidar-viewer" id="lidarViewer">
+      <div class="lidar-hint" id="lidarHint">Loading point cloud…</div>
+    </div>
+  </div>
+</section>
+
+<!-- ====================== INPUT / OUTPUT ====================== -->
+<section class="section" id="io">
+  <h2 class="section-title">Input &amp; output</h2>
+  <div class="flow">
+    <div class="flow-col">
+      <div class="flow-label">Input</div>
+      <div class="chip-grid">
+        <span class="chip"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h3l2-2h6l2 2h3v12H4z"/><circle cx="12" cy="13" r="3.2"/></svg>Street-view images</span>
+        <span class="chip"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 3L3 6v15l6-3 6 3 6-3V3l-6 3-6-3z"/><path d="M9 3v15M15 6v15"/></svg>Aerial maps</span>
+        <span class="chip"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="5" cy="6" r="1.6"/><circle cx="12" cy="4" r="1.6"/><circle cx="19" cy="7" r="1.6"/><circle cx="6" cy="13" r="1.6"/><circle cx="13" cy="12" r="1.6"/><circle cx="18" cy="15" r="1.6"/><circle cx="8" cy="19" r="1.6"/><circle cx="15" cy="19" r="1.6"/></svg>LiDAR point clouds</span>
+        <span class="chip"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s-6.5-6.1-6.5-11A6.5 6.5 0 0112 3.5 6.5 6.5 0 0118.5 10c0 4.9-6.5 11-6.5 11z"/><circle cx="12" cy="10" r="2.2"/></svg>GIS layers</span>
+      </div>
+    </div>
+
+    <div class="flow-arrow">→</div>
+
+    <div class="flow-col">
+      <div class="flow-label">Output — planned for</div>
+      <div class="chip-grid">
+        <span class="chip goal"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M20.8 8.6c0 5.6-8.8 11.4-8.8 11.4S3.2 14.2 3.2 8.6a5.4 5.4 0 019.2-3.8 5.4 5.4 0 019.2 3.8z"/></svg>Quality of life</span>
+        <span class="chip goal"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3.5v14a3 3 0 11-2-2.83V6a2 2 0 114 0v8.67"/></svg>Temperature &amp; heat</span>
+        <span class="chip goal"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4.5 8-11V5l-8-3-8 3v6c0 6.5 8 11 8 11z"/></svg>Safety</span>
+        <span class="chip goal"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="5" r="2"/><path d="M12 7v6l-4 8M12 13l4 8M8 11l-3 2M16 11l3 2"/></svg>Walkability</span>
+      </div>
+    </div>
+  </div>
+  <p class="io-note">Feed in what a street or area currently looks like, and get back a picture of how it could be reshaped, planned around the goals that matter for the people who live there.</p>
+</section>
+
+<footer>© <span id="yr"></span> Kanchan Sharma .</footer>
+
+<script>
+function tryNextExt(img){
+  const exts = ['png','jpg','jpeg'];
+  let tried = parseInt(img.dataset.tried || '0', 10) + 1;
+  img.dataset.tried = tried;
+  if (tried < exts.length){ img.src = img.dataset.base + '.' + exts[tried]; }
+  else { img.onerror = null; }
+}
+document.getElementById('yr').textContent = new Date().getFullYear();
+const root = document.documentElement;
+const toggle = document.getElementById('modeToggle');
+function setMode(light){
+  root.classList.toggle('light', light);
+  toggle.textContent = light ? '☾' : '◐';
+  localStorage.setItem('kanchan-theme', light ? 'light' : 'dark');
+}
+const saved = localStorage.getItem('kanchan-theme');
+setMode(saved === 'light');
+toggle.addEventListener('click', () => setMode(!root.classList.contains('light')));
+toggle.addEventListener('keydown', e => { if(e.key==='Enter'||e.key===' '){ e.preventDefault(); toggle.click(); } });
+
+/* ---- Dataset tabs ---- */
+const tabBtns = document.querySelectorAll('.tab-btn');
+const tabPanels = document.querySelectorAll('.tab-panel');
+tabBtns.forEach(btn => {
+  btn.addEventListener('click', () => {
+    const name = btn.dataset.tab;
+    tabBtns.forEach(b => { b.classList.toggle('active', b === btn); b.setAttribute('aria-selected', b === btn ? 'true' : 'false'); });
+    tabPanels.forEach(p => p.classList.toggle('active', p.id === 'panel-' + name));
+    if (name === 'lidar') initLidarViewer();
+  });
+});
+</script>
+
+<script type="module">
+// ---- LiDAR point-cloud viewer (Three.js), lazy-initialized when the LiDAR tab is opened ----
+// Reads a CSV point cloud from the repo root: lidar1.csv
+// Auto-detects columns: looks for x/y/z and optional r,g,b (or red,green,blue) in the header row.
+import * as THREE from 'https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js';
+import { OrbitControls } from 'https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/controls/OrbitControls.js';
+
+let lidarInited = false;
+
+function parseCSVPointCloud(text, MAX_POINTS) {
+  const lines = text.split(/\r\n|\n|\r/).filter(l => l.trim().length > 0);
+  if (!lines.length) throw new Error('Empty file');
+
+  const firstLine = lines[0];
+  const delim = firstLine.includes(',') ? ',' : (firstLine.includes('\t') ? '\t' : /\s+/);
+  const splitLine = (line) => (delim instanceof RegExp ? line.trim().split(delim) : line.split(delim)).map(s => s.trim());
+
+  let header = splitLine(firstLine);
+  let hasHeader = header.some(cell => isNaN(parseFloat(cell)));
+
+  let colIndex = { x: 0, y: 1, z: 2, r: -1, g: -1, b: -1 };
+  let dataLines = lines;
+
+  if (hasHeader) {
+    const lower = header.map(h => h.toLowerCase());
+    const find = (...names) => lower.findIndex(h => names.includes(h));
+    colIndex.x = find('x', 'x_coord', 'xcoord', 'easting');
+    colIndex.y = find('y', 'y_coord', 'ycoord', 'northing');
+    colIndex.z = find('z', 'z_coord', 'zcoord', 'elevation', 'height');
+    colIndex.r = find('r', 'red');
+    colIndex.g = find('g', 'green');
+    colIndex.b = find('b', 'blue');
+    if (colIndex.x < 0 || colIndex.y < 0 || colIndex.z < 0) {
+      colIndex.x = 0; colIndex.y = 1; colIndex.z = 2;
+    }
+    dataLines = lines.slice(1);
+  }
+
+  const total = dataLines.length;
+  const step = Math.max(1, Math.floor(total / MAX_POINTS));
+  const rawPositions = [];
+  const colors = [];
+  const hasColor = colIndex.r >= 0 && colIndex.g >= 0 && colIndex.b >= 0;
+  let colorMax = 1;
+
+  for (let i = 0; i < total; i += step) {
+    const cells = splitLine(dataLines[i]);
+    const x = parseFloat(cells[colIndex.x]);
+    const y = parseFloat(cells[colIndex.y]);
+    const z = parseFloat(cells[colIndex.z]);
+    if (Number.isNaN(x) || Number.isNaN(y) || Number.isNaN(z)) continue;
+    rawPositions.push(x, y, z);
+    if (hasColor) {
+      const r = parseFloat(cells[colIndex.r]);
+      const g = parseFloat(cells[colIndex.g]);
+      const b = parseFloat(cells[colIndex.b]);
+      if (r > colorMax || g > colorMax || b > colorMax) colorMax = 255;
+      colors.push(r, g, b);
+    }
+  }
+
+  if (!rawPositions.length) throw new Error('No numeric point rows found');
+
+  const ox = rawPositions[0], oy = rawPositions[1], oz = rawPositions[2];
+  const positions = new Float32Array(rawPositions.length);
+  for (let i = 0; i < rawPositions.length; i += 3) {
+    positions[i] = rawPositions[i] - ox;
+    positions[i + 1] = rawPositions[i + 1] - oy;
+    positions[i + 2] = rawPositions[i + 2] - oz;
+  }
+
+  const geometry = new THREE.BufferGeometry();
+  geometry.setAttribute('position', new THREE.Float32BufferAttribute(positions, 3));
+  if (hasColor) {
+    const normalized = colors.map(c => c / colorMax);
+    geometry.setAttribute('color', new THREE.Float32BufferAttribute(normalized, 3));
+  }
+  return { geometry, hasColor };
+}
+
+async function fetchWithProgress(url, hint) {
+  const res = await fetch(url);
+  if (!res.ok || !res.body) {
+    if (!res.ok) throw new Error('not found');
+    return res.text();
+  }
+  const contentLength = +res.headers.get('Content-Length');
+  const reader = res.body.getReader();
+  const chunks = [];
+  let received = 0;
+  while (true) {
+    const { done, value } = await reader.read();
+    if (done) break;
+    chunks.push(value);
+    received += value.length;
+    if (contentLength) {
+      const pct = Math.round((received / contentLength) * 100);
+      hint.textContent = 'Downloading point cloud… ' + pct + '%';
+    } else {
+      hint.textContent = 'Downloading point cloud… ' + (received / 1e6).toFixed(1) + ' MB';
+    }
+  }
+  const all = new Uint8Array(received);
+  let pos = 0;
+  for (const chunk of chunks) { all.set(chunk, pos); pos += chunk.length; }
+  return new TextDecoder('utf-8').decode(all);
+}
+
+window.initLidarViewer = function initLidarViewer() {
+  if (lidarInited) return;
+  lidarInited = true;
+
+  const container = document.getElementById('lidarViewer');
+  const hint = document.getElementById('lidarHint');
+  const DATA_FILE = 'lidar1.csv';
+  const MAX_POINTS = 400000;
+  if (!container) return;
+
+  const scene = new THREE.Scene();
+  scene.background = new THREE.Color(0x05060a);
+
+  const camera = new THREE.PerspectiveCamera(55, container.clientWidth / container.clientHeight, 0.01, 5000);
+  camera.position.set(0, 0, 5);
+
+  const renderer = new THREE.WebGLRenderer({ antialias: true });
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+  renderer.setSize(container.clientWidth, container.clientHeight);
+  container.appendChild(renderer.domElement);
+
+  const controls = new OrbitControls(camera, renderer.domElement);
+  controls.enableDamping = true;
+  controls.dampingFactor = 0.08;
+  controls.screenSpacePanning = true;
+  controls.rotateSpeed = 0.6;
+  controls.zoomSpeed = 0.8;
+  controls.panSpeed = 0.6;
+  controls.mouseButtons = { LEFT: THREE.MOUSE.ROTATE, MIDDLE: THREE.MOUSE.DOLLY, RIGHT: THREE.MOUSE.PAN };
+
+  scene.add(new THREE.AmbientLight(0xffffff, 0.6));
+  const dl = new THREE.DirectionalLight(0xffffff, 0.6);
+  dl.position.set(1, 1, 1);
+  scene.add(dl);
+
+  fetchWithProgress(DATA_FILE, hint)
+    .then(text => {
+      hint.textContent = 'Parsing point cloud…';
+      return new Promise(resolve => setTimeout(() => resolve(text), 30));
+    })
+    .then(text => {
+      const { geometry, hasColor } = parseCSVPointCloud(text, MAX_POINTS);
+      geometry.computeBoundingBox();
+
+      const material = new THREE.PointsMaterial({
+        size: 0.015,
+        sizeAttenuation: true,
+        vertexColors: hasColor,
+        color: hasColor ? 0xffffff : 0xE8871E
+      });
+
+      const points = new THREE.Points(geometry, material);
+
+      const box = geometry.boundingBox;
+      const center = new THREE.Vector3();
+      box.getCenter(center);
+      points.position.sub(center);
+
+      const size = new THREE.Vector3();
+      box.getSize(size);
+      const maxDim = Math.max(size.x, size.y, size.z) || 1;
+      const scale = 3 / maxDim;
+      points.scale.setScalar(scale);
+
+      scene.add(points);
+
+      camera.position.set(0, 0, maxDim * scale * 1.6 + 2);
+      controls.update();
+
+      hint.style.display = 'none';
+    })
+    .catch(err => {
+      console.error(err);
+      hint.innerHTML = 'Point cloud not found or could not be read.<br>Make sure <strong>' + DATA_FILE + '</strong> is at the repo root and contains x,y,z (and optionally r,g,b) columns.';
+    });
+
+  function onResize() {
+    const w = container.clientWidth, h = container.clientHeight;
+    if (!w || !h) return;
+    camera.aspect = w / h;
+    camera.updateProjectionMatrix();
+    renderer.setSize(w, h);
+  }
+  window.addEventListener('resize', onResize);
+
+  function animate() {
+    requestAnimationFrame(animate);
+    controls.update();
+    renderer.render(scene, camera);
+  }
+  animate();
+};
+</script>
+</body>
+</html>

@@ -174,6 +174,13 @@ a.card{cursor:pointer;}
 .exp-item .org{font-size:13px; color:var(--accent-2); margin-bottom:8px;}
 .exp-item p{font-size:13.5px; color:var(--ink-soft);}
 
+.project-card{border:1px solid var(--line); border-radius:8px; background:var(--surface); padding:26px; display:block; transition:transform .2s, border-color .2s;}
+.project-card:hover{transform:translateY(-3px); border-color:var(--accent);}
+.project-card .tag{font-family:'IBM Plex Mono',monospace; font-size:10.5px; text-transform:uppercase; letter-spacing:.08em; color:var(--accent-2); margin-bottom:10px; display:block;}
+.project-card h4{font-size:19px; margin-bottom:8px;}
+.project-card p{font-size:14px; color:var(--ink-soft); margin-bottom:14px;}
+.project-card .go{font-size:13px; font-weight:600; color:var(--accent);}
+
 .cv-box{border:1px solid var(--line); border-radius:8px; background:var(--surface); padding:36px; display:flex; justify-content:space-between; align-items:center; gap:28px; flex-wrap:wrap;}
 .cv-box h3{font-size:19px; margin-bottom:8px;}
 .cv-box p{color:var(--ink-soft); font-size:14px; max-width:420px;}
@@ -250,7 +257,7 @@ footer{padding:30px 32px; text-align:center; font-size:12px; color:var(--ink-sof
         <button class="toplink">Research <span class="caret">▾</span></button>
         <div class="dropdown">
           <a href="research.html#research">Research</a>
-          <a href="research.html#projects">Current Projects</a>
+          <a href="project-urban-redevelopment.html" target="_blank" rel="noopener">Project Page</a>
           <a href="research.html#publications">Publications</a>
         </div>
       </div>
@@ -276,11 +283,16 @@ footer{padding:30px 32px; text-align:center; font-size:12px; color:var(--ink-sof
   </p>
 </section>
 
-<!-- ====================== CURRENT PROJECTS ====================== -->
+<!-- ====================== PROJECT PAGE ====================== -->
 <section class="section" id="projects">
-  <div class="eyebrow">Research — Current Projects</div>
-  <h2 class="section-title">Current Projects</h2>
-  <p class="section-sub">Coming soon.</p>
+  <div class="eyebrow">Research — Project Page</div>
+  <h2 class="section-title">Project Page</h2>
+  <a href="project-urban-redevelopment.html" target="_blank" rel="noopener" class="project-card">
+    <span class="tag">Ongoing</span>
+    <h4>A Dataset for Scene Understanding to Plan Urban Areas for Better Quality of Life</h4>
+    <p>What I work on, the data I work with, and how it's explored — street-view imagery, UAV captures, GIS layers, and an interactive LiDAR point cloud.</p>
+    <span class="go">Open project page →</span>
+  </a>
 </section>
 
 <!-- ====================== PUBLICATIONS ====================== -->
